@@ -166,9 +166,10 @@
   (elpy-enable))
 
 (remove-hook 'elpy-modules 'elpy-module-flymake)
-(remove-hook 'elpy-modules 'elpy-highlight-indentation-mode)
-
 (global-set-key (kbd "C-;") 'yas-expand )
+(setq highlight-indentation-mode nil)
+
+
 (use-package iedit
   :ensure t
   :bind ( "C-'" . iedit-mode))
