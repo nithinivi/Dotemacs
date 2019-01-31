@@ -110,6 +110,8 @@
 
 
 ;; visual
+;;============================================================================
+
 
 (use-package powerline
   :disabled
@@ -121,17 +123,35 @@
 ;;genral programming
 ;;============================================================================
 
+
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode)
+  (projectile-mode +1)
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  )
+
+(use-package counsel-projectile
+  :ensure
+  :config
+  (counsel-projectile-mode)
+  )
+
 (use-package yasnippet-snippets
   :ensure t)
 
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status))
+
 (use-package git-gutter
   :ensure t
   :config
   (global-git-gutter-mode 't)
   :diminish git-gutter-mode)
+
 (use-package git-timemachine
   :ensure t)
 
@@ -167,6 +187,21 @@
   (setq guide-key/guide-key-sequence '("C-x r" "C-x 4" "C-c"))
   (guide-key-mode 1)))
 
+;;web-mode
+;;============================================================================
+
+(use-package web-mode
+  :ensure t
+  :config
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+
+  )
+(use-package emmet-mode
+  :ensure t
+  )
+
+
 
 ;; Genrated content
 ;;============================================================================
@@ -182,7 +217,7 @@
     ("4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" default)))
  '(package-selected-packages
    (quote
-    (git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package))))
+    (projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
