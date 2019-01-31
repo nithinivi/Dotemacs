@@ -67,7 +67,8 @@
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config
-  (load-theme 'sanityinc-solarized-dark))
+  ;;(load-theme 'sanityinc-solarized-dark)
+  )
 
 
 (use-package use-package-chords
@@ -164,9 +165,10 @@
   :config
   (elpy-enable))
 
-(remove-hook 'elpy-modules '(elpy-module-flymake highlight-indentation-mode))
-(define-key yas-minor-mode-map (kbd "C-;") 'yas-expand)
+(remove-hook 'elpy-modules 'elpy-module-flymake)
+(remove-hook 'elpy-modules 'elpy-highlight-indentation-mode)
 
+(global-set-key (kbd "C-;") 'yas-expand )
 (use-package iedit
   :ensure t
   :bind ( "C-'" . iedit-mode))
@@ -174,10 +176,12 @@
 (use-package company
   :ensure t
   :config
-  (add-hook 'after-init-mode 'global-company-mode)
+  (global-company-mode 1)
   (setq company-idle-delay 0)
   (setq company-minimum-prefix-length 2)
   )
+
+(add-hook 'python-mode-hook 'yas-minor-mode)
 
 (use-package guide-key
   :defer t
@@ -200,7 +204,6 @@
 (use-package emmet-mode
   :ensure t
   )
-
 
 
 ;; Genrated content
