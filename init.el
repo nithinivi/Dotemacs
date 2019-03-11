@@ -167,7 +167,7 @@
 (use-package smartparens
   :ensure t
   :config
-  (add-hook 'python-mode-hook 'smartparens))
+  (smartparens-global-mode t) )
 
 (use-package aggressive-indent
   :ensure t
