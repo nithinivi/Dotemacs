@@ -50,7 +50,7 @@
 (global-set-key (kbd "C-M-.") 'forward-sexp )
 (global-set-key (kbd "C-M-,") 'backward-sexp)
 
-
+(global-set-key (kbd "C-c d") 'kill-whole-line)
 ;;General packages
 ;;============================================================================
 
@@ -173,7 +173,7 @@
   :ensure t
   :config
   (global-aggressive-indent-mode 1)
-  (add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+  (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
 
 
 
@@ -240,7 +240,7 @@
     ("4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" default)))
  '(package-selected-packages
    (quote
-    (aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package))))
+    (drag-stuff aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
