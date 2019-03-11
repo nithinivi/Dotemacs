@@ -15,7 +15,7 @@
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 (add-hook 'before-save-hook (lambda () (delete-trailing-whitespace)))
 (windmove-default-keybindings)
-(delete-selection-mode t)
+;;(delete-selection-mode t)
 (column-number-mode t)
 (tool-bar-mode -1)
 (blink-cursor-mode -1)
@@ -192,7 +192,7 @@
 
 (use-package iedit
   :ensure t
-  :bind ( "C-'" . iedit-mode))
+  :bind ( "C-c i" . iedit-mode))
 
 (use-package company
   :ensure t
@@ -240,7 +240,7 @@
     ("4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" default)))
  '(package-selected-packages
    (quote
-    (drag-stuff aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package))))
+    (nlinum drag-stuff aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
