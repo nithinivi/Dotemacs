@@ -1,4 +1,4 @@
-(require 'package)
+``(require 'package)
 (require 'json)
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
@@ -315,6 +315,15 @@ might be bad."
     (setq guide-key/guide-key-sequence '("C-x r" "C-x 4" "C-c"))
     (guide-key-mode 1)))
 
+(use-package conda
+  :ensure t
+  :config
+  (conda-env-initialize-interactive-shells)
+  ;; if you want eshell support, include:
+  (conda-env-initialize-eshell)
+  ;; if you want auto-activation (see below for details), include:
+  (conda-env-autoactivate-mode t))
+
 ;;web-mode
 ;;============================================================================
 
@@ -351,6 +360,7 @@ might be bad."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(conda-anaconda-home "/home/nithin/miniconda3/")
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
@@ -361,7 +371,7 @@ might be bad."
  '(fci-rule-color "#073642")
  '(package-selected-packages
    (quote
-    (exce-path-from-shell restclient-test dired-details docker conda ein nlinum drag-stuff aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package)))
+    (ace-jump-mode exce-path-from-shell restclient-test dired-details docker conda ein nlinum drag-stuff aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
