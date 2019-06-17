@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: abs_join_path
+# key: abj
+# --
+
+os.path.abspath(os.path.join(os.getcwd(), $1))$0

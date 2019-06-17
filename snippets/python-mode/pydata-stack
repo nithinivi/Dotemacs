@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: pydata-stack
+# key: impstk
+# --
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import sklearn.stats as stats
+import matplotlib.pyplot as plt

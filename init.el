@@ -44,14 +44,14 @@
 
 ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
-
+(set-face-attribute 'default nil :height 125)
 
 
 (global-set-key (kbd "C-M-.") 'forward-sexp )
 (global-set-key (kbd "C-M-,") 'backward-sexp)
 
 (global-set-key (kbd "C-c d") 'kill-whole-line)
-
+(setq dired-dwim-target t)
 
 (defun cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
@@ -81,9 +81,10 @@ might be bad."
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config
-  ;;(load-theme 'sanityinc-solarized-dark)
+  (load-theme 'manoj-dark)
   )
 
+(highlight-indentation-mode -1)
 
 (use-package use-package-chords
   :ensure t
@@ -206,7 +207,7 @@ might be bad."
   :ensure t
   :config
   (setq company-idle-delay 0)
-  (setq company-minimum-prefix-length 1)
+  (setq company-minimum-prefix-length 2)
   (setq company-selection-wrap-around t)
   (company-tng-configure-default)
 
@@ -221,7 +222,7 @@ might be bad."
   :ensure t
   :if (memq window-system '(mac ns x))
   :config
-  (setq exec-path-from-shell-variables '("PATH" "GOPATH"))
+  (setq exec-path-from-shell-variables '("PATH" "GOPATH" "GOROOT" "GOBIN"))
   (exec-path-from-shell-initialize))
 
 ;;golang
@@ -239,7 +240,7 @@ might be bad."
 ;; gofmt/goimports every time you save anyways.
 (add-hook 'before-save-hook 'gofmt-before-save)
 
-(global-set-key (kbd "C-;") 'company-complete)
+(global-set-key (kbd "?\t") 'company-complete)
 
 
 (defun my-go-mode-hook ()
@@ -291,9 +292,9 @@ might be bad."
 ;; (remove-hook 'elpy-modules 'elpy-module-flymake)
 ;; (global-set-key (kbd "C-;") 'yas-expand )
 ;; (setq highlight-indentation-mode nil)
+;; (setq python-shell-interpreter "ipython")
+;; ;;python-shell-interpreter-args "-i--simple-prompt")
 
-;; (setq python-shell-interpreter "ipython"
-;;       python-shell-interpreter-args "-i --simple-prompt")
 (define-key python-mode-map (kbd "C-c r") 'python-shell-send-region )
 
 
@@ -361,7 +362,7 @@ might be bad."
  '(fci-rule-color "#073642")
  '(package-selected-packages
    (quote
-    (exce-path-from-shell restclient-test dired-details docker conda ein nlinum drag-stuff aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package)))
+    (dockerfile-mode exce-path-from-shell restclient-test dired-details docker conda ein nlinum drag-stuff aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
