@@ -44,7 +44,7 @@
 
 ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
-(set-face-attribute 'default nil :height 125)
+(set-face-attribute 'default nil :height 155)
 
 
 (global-set-key (kbd "C-M-.") 'forward-sexp )
@@ -353,6 +353,35 @@ might be bad."
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
 (setq dried-dwim-target t)
+
+
+
+;;sql specific
+;;============================================================================
+(setq sql-connection-alist
+      '((server1 (sql-product 'postgres)
+                 (sql-port 5432)
+                 (sql-server "localhost")
+                 (sql-user "nithin")
+                 (sql-database "kyc"))
+        ))
+
+(defun my-sql-connect (product connection)
+  ;; load the password
+  (require my-password "my-password.el.gpg")
+
+  ;; update the password to the sql-connection-alist
+  (let ((connection-info (assoc connection sql-connection-alist))
+        (sql-password (car (last (assoc connection my-sql-password)))))
+    (delete sql-password connection-info)
+    (nconc connection-info `((sql-password ,sql-password)))
+    (setq sql-connection-alist (assq-delete-all connection sql-connection-alist))
+    (add-to-list 'sql-connection-alist connection-info))
+
+  ;; connect to database
+  (setq sql-product product)
+  (sql-connect connection))
+
 
 ;; Genrated content
 ;;============================================================================
