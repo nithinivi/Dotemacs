@@ -203,19 +203,18 @@ might be bad."
   (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
 
 
-(use-package company
-  :ensure t
-  :config
-  (setq company-idle-delay 0)
-  (setq company-minimum-prefix-length 2)
-  (setq company-selection-wrap-around t)
-  (company-tng-configure-default)
+;; (use-package company
+;;   :ensure t
+;;   :bind ("C-M-;" . company-complete)
+;;   :config
+;;   (setq company-idle-delay 0)
+;;   (setq company-minimum-prefix-length 2)
+;;   (setq company-selection-wrap-around t)
+;;   (company-tng-configure-default)
 
-  )
+;;   )
 
-(add-hook 'after-init-hook 'global-company-mode)
-
-
+;; (add-hook 'after-init-hook 'global-company-mode)
 ;;exec
 ;;============================================================================
 (use-package exec-path-from-shell
@@ -339,6 +338,9 @@ might be bad."
   :ensure t
   )
 
+(use-package restclient
+  :load-path "~/.emacs.d/package/restclient")
+
 ;;dired-mode
 ;;============================================================================
 (use-package dired-details
@@ -383,47 +385,23 @@ might be bad."
   (sql-connect connection))
 
 
-;; Genrated content
+;; Projectile mode
 ;;============================================================================
+
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode)
+  (setq projectile-completion-system 'ivy)
+  )
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(conda-anaconda-home "/home/nithin/miniconda3/")
- '(ansi-color-faces-vector
-   [default bold shadow italic underline bold bold-italic bold])
- '(ansi-color-names-vector
-   (vector "#839496" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#002b36"))
- '(custom-safe-themes
-   (quote
-    ("4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" default)))
- '(fci-rule-color "#073642")
  '(package-selected-packages
    (quote
-    (ace-jump-mode exce-path-from-shell restclient-test dired-details docker conda ein nlinum drag-stuff aggressive-indent dumb-jump projectile emmet-mode web-mode git-timemachine git-gutter magit smartparens yasnippet-snippets exec-path-from-shell iedit elpy undo-tree counsel ivy-hydra ivy smex use-package-chords color-theme-sanityinc-solarized ag use-package)))
- '(vc-annotate-background nil)
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#dc322f")
-     (40 . "#cb4b16")
-     (60 . "#b58900")
-     (80 . "#859900")
-     (100 . "#2aa198")
-     (120 . "#268bd2")
-     (140 . "#d33682")
-     (160 . "#6c71c4")
-     (180 . "#dc322f")
-     (200 . "#cb4b16")
-     (220 . "#b58900")
-     (240 . "#859900")
-     (260 . "#2aa198")
-     (280 . "#268bd2")
-     (300 . "#d33682")
-     (320 . "#6c71c4")
-     (340 . "#dc322f")
-     (360 . "#cb4b16"))))
- '(vc-annotate-very-old-color nil))
+    (restclient restclinet yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens nlinum magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy ein dumb-jump dockerfile-mode docker counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
