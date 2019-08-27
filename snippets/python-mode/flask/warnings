@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name:
-# key: warn
+# name: warning
+# key: flog
 # --
 app.logger.warning($1)
 $0

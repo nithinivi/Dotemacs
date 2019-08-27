@@ -13,23 +13,21 @@
 ;; Keep all backup and auto-save files in one directory
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
-;;(add-hook 'before-save-hook (lambda () (delete-trailing-whitespace)))
-(windmove-default-keybindings)
-;;(delete-selection-mode t)
-(column-number-mode t)
+(add-hook 'before-save-hook (lambda () (delete-trailing-whitespace)))
+
+(scroll-bar-mode -1)
 (tool-bar-mode -1)
 (blink-cursor-mode -1)
-(scroll-bar-mode -1)
-(set-cursor-color "black")
-
-
+(show-paren-mode t)
+(column-number-mode t)
 (setq column-number-mode 1)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message "")
-(show-paren-mode t)
+
 
 (bind-key  "M-+" 'text-scale-increase)
 (bind-key  "M--" 'text-scale-decrease)
+
 
 
 (prefer-coding-system 'utf-8)
@@ -59,7 +57,7 @@ Does not indent buffer, because it is used for a before-save-hook, and that
 might be bad."
   (interactive)
   (untabify (point-min) (point-max))
-  (delete-trailing-whitespace)
+  ;;  (delete-trailing-whitespace)
   (set-buffer-file-coding-system 'utf-8))
 
 ;; Various superfluous white-space. Just say no.
@@ -67,7 +65,6 @@ might be bad."
 
 ;;General packages
 ;;============================================================================
-
 
 ;; (use-package exec-path-from-shell
 ;;   :ensure t
@@ -78,11 +75,6 @@ might be bad."
   :if (not noninteractive)
   :ensure ag)
 
-(use-package color-theme-sanityinc-solarized
-  :ensure t
-  :config
-  (load-theme 'manoj-dark)
-  )
 
 (highlight-indentation-mode -1)
 
@@ -125,33 +117,6 @@ might be bad."
   ("C-{" . undo-tree-redo))
 
 
-;; visual
-;;============================================================================
-
-
-(use-package powerline
-  :disabled
-  :ensure t
-  :config
-  (setq powerline-default-separator 'utf-8))
-
-
-
-(use-package hideshow
-  :hook ((prog-mode . hs-minor-mode)))
-
-(defun toggle-fold ()
-  (interactive)
-  (save-excursion
-    (end-of-line)
-    (hs-toggle-hiding)))
-
-(global-set-key (kbd "C-=") 'hs-toggle-hiding)
-
-;;genral programming
-;;============================================================================
-
-
 (use-package projectile
   :ensure t
   :config
@@ -174,15 +139,9 @@ might be bad."
   :ensure t
   :bind ("C-x g" . magit-status))
 
-(use-package git-gutter
-  :ensure t
-  :config
-  (global-git-gutter-mode 't)
-  :diminish git-gutter-mode)
 
-(use-package git-timemachine
-  :ensure t)
-
+;; visual
+;;============================================================================
 
 (use-package dumb-jump   ;; for jumping to the source
   :ensure t
@@ -195,68 +154,6 @@ might be bad."
   :ensure t
   :config
   (smartparens-global-mode t) )
-
-(use-package aggressive-indent
-  :ensure t
-  :config
-  (global-aggressive-indent-mode 1)
-  (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
-
-
-;; (use-package company
-;;   :ensure t
-;;   :bind ("C-M-;" . company-complete)
-;;   :config
-;;   (setq company-idle-delay 0)
-;;   (setq company-minimum-prefix-length 2)
-;;   (setq company-selection-wrap-around t)
-;;   (company-tng-configure-default)
-
-;;   )
-
-;; (add-hook 'after-init-hook 'global-company-mode)
-;;exec
-;;============================================================================
-(use-package exec-path-from-shell
-  :ensure t
-  :if (memq window-system '(mac ns x))
-  :config
-  (setq exec-path-from-shell-variables '("PATH" "GOPATH" "GOROOT" "GOBIN"))
-  (exec-path-from-shell-initialize))
-
-;;golang
-;;============================================================================
-
-(use-package go-mode
-  :ensure t)
-(use-package go-eldoc
-  :ensure t)
-(use-package company-go
-  :ensure t)
-(setq gofmt-command "goimports")
-;; UPDATE: gofmt-before-save is more convenient then having a command
-;; for running gofmt manually. In practice, you want to
-;; gofmt/goimports every time you save anyways.
-(add-hook 'before-save-hook 'gofmt-before-save)
-
-(global-set-key (kbd "?\t") 'company-complete)
-
-
-(defun my-go-mode-hook ()
-  ;; UPDATE: I commented the next line out because it isn't needed
-  ;; with the gofmt-before-save hook above.
-  ;; (local-set-key (kbd "C-c m") 'gofmt)
-  (local-set-key (kbd "M-.") 'godef-jump))
-(add-hook 'go-mode-hook (lambda ()
-                          (set (make-local-variable 'company-backends) '(company-go))
-                          (company-mode)))
-
-(add-hook 'go-mode-hook 'my-go-mode-hook)
-(add-hook 'go-mode-hook 'go-eldoc-setup)
-(add-hook 'go-mode-hook 'company-mode)
-(add-hook 'go-mode-hook 'yas-minor-mode)
-
-
 
 
 ;; python  configrations
@@ -324,81 +221,30 @@ might be bad."
   ;; if you want auto-activation (see below for details), include:
   (conda-env-autoactivate-mode t))
 
-;;web-mode
-;;============================================================================
-
-(use-package web-mode
-  :ensure t
-  :config
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-
-  )
-(use-package emmet-mode
-  :ensure t
-  )
-
-(use-package restclient
-  :load-path "~/.emacs.d/package/restclient")
-
-;;dired-mode
-;;============================================================================
-(use-package dired-details
-  :load-path "~/.emacs.d/package/dired-details"
-  :config
-  (setq-default dired-details-hidden-string "--- ")
-  (dired-details-install))
-;; Auto refresh buffers
-(global-auto-revert-mode 1)
-
-;; Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
-(setq dried-dwim-target t)
 
 
 
-;;sql specific
-;;============================================================================
-(setq sql-connection-alist
-      '((server1 (sql-product 'postgres)
-                 (sql-port 5432)
-                 (sql-server "localhost")
-                 (sql-user "nithin")
-                 (sql-database "kyc"))
-        ))
-
-(defun my-sql-connect (product connection)
-  ;; load the password
-  (require my-password "my-password.el.gpg")
-
-  ;; update the password to the sql-connection-alist
-  (let ((connection-info (assoc connection sql-connection-alist))
-        (sql-password (car (last (assoc connection my-sql-password)))))
-    (delete sql-password connection-info)
-    (nconc connection-info `((sql-password ,sql-password)))
-    (setq sql-connection-alist (assq-delete-all connection sql-connection-alist))
-    (add-to-list 'sql-connection-alist connection-info))
-
-  ;; connect to database
-  (setq sql-product product)
-  (sql-connect connection))
+;; (delete-selection-mode t)
+(require 'server)
+(unless (server-running-p)
+  (server-start))
 
 
-;; Projectile mode
-;;============================================================================
 
-(use-package projectile
-  :ensure t
-  :config
-  (projectile-global-mode)
-  (setq projectile-completion-system 'ivy)
-  )
+(when window-system
+  (load "~/.emacs.d/init_gui.el"))
+
+(when (not window-system)
+  (load "~/.emacs.d/init_terminal.el"))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
  '(package-selected-packages
    (quote
     (restclient restclinet yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens nlinum magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy ein dumb-jump dockerfile-mode docker counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag))))
