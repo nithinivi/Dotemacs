@@ -1,5 +1,5 @@
 (windmove-default-keybindings)
-
+(set-face-attribute 'default nil :height 140)
 
 (use-package color-theme-sanityinc-solarized
   :ensure t
@@ -127,7 +127,7 @@
 ;;dired-mode
 ;;===========================================D=================================
 (use-package dired-details
-  :load-path "~/.emacs.d/package/dired-details"
+  :load-path "~/.emacs.d/package"
   :config
   (setq-default dired-details-hidden-string "--- ")
   (dired-details-install))
@@ -170,3 +170,14 @@
 
 ;; Projectile mode
 ;;============================================================================
+
+
+
+;;slack mode
+;;============================================================================
+(use-package slack
+  :commands (slack-start)
+  :init
+  (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
+
+  )

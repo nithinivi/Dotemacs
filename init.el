@@ -76,7 +76,7 @@ might be bad."
   :ensure ag)
 
 
-(highlight-indentation-mode -1)
+;;(highlight-indentation-mode -1)
 
 (use-package use-package-chords
   :ensure t
@@ -176,13 +176,19 @@ might be bad."
   )
 
 
-
+(defun python-buffer-mode()
+  (interactive)
+  (progn( yas-minor-mode 1)
+        (highlight-indentation-mode))
+  )
 
 (use-package elpy
 
   :ensure t
   :config
-  (elpy-enable))
+  (elpy-enable)
+  (add-hook 'python-mode-hook 'python-buffer-mode)
+)
 
 
 ;; (remove-hook 'elpy-modules 'elpy-module-flymake)
@@ -195,14 +201,14 @@ might be bad."
 
 
 
-(use-package ein
-  :ensure t)
+;; (use-package ein
+;;   :ensure t)
 
 (use-package iedit
   :ensure t
   :bind ( "C-c i" . iedit-mode))
 
-(add-hook 'python-mode-hook 'yas-minor-mode)
+
 
 (use-package guide-key
   :defer t
@@ -247,7 +253,7 @@ might be bad."
     ("4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
  '(package-selected-packages
    (quote
-    (restclient restclinet yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens nlinum magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy ein dumb-jump dockerfile-mode docker counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag))))
+    (polymode restclient restclinet yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens nlinum magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy ein dumb-jump dockerfile-mode docker counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
