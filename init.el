@@ -196,7 +196,31 @@ might be bad."
   )
 
 (add-hook 'after-init-hook 'global-company-mode)
+;; scratch buffer  configrations
+;;============================================================================
 
+(use-package persistent-scratch
+  :ensure t
+  :config
+
+  (persistent-scratch-autosave-mode 1))
+
+
+;; lsp  configrations
+;;============================================================================
+
+
+(use-package lsp-mode
+  :ensure t
+  :hook (python-mode . lsp)
+  :commands lsp)
+
+;; optionally
+(use-package lsp-ui :ensure t :commands lsp-ui-mode)
+(use-package company-lsp :ensure t :commands company-lsp)
+(use-package flycheck
+  :ensure t
+  :hook (python-mode-hook . flycheck-mode))
 ;; python  configrations
 ;;============================================================================
 (use-package conda
@@ -206,7 +230,7 @@ might be bad."
   :config
   ;; If you want interactive shell support, include:
   (conda-env-initialize-interactive-shells)
-    ;; If you want eshell support, include:
+  ;; If you want eshell support, include:
   (conda-env-initialize-eshell)
   ;; If you want auto-activation, include:
   (conda-env-autoactivate-mode t)
@@ -299,7 +323,7 @@ might be bad."
  '(fci-rule-color "#073642")
  '(package-selected-packages
    (quote
-    (hemisu-theme markdown-mode company-jedi virtualenvwrapper company-fuzzy web-mode use-package-chords undo-tree smex smartparens polymode org-bullets magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy dumb-jump counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag)))
+    (persistent-scratch flycheck company-lsp lsp-ui lsp-mode hemisu-theme markdown-mode company-jedi virtualenvwrapper company-fuzzy web-mode use-package-chords undo-tree smex smartparens polymode org-bullets magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy dumb-jump counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag)))
  '(python-shell-interpreter "python3.7")
  '(vc-annotate-background nil)
  '(vc-annotate-color-map

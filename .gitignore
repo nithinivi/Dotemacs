@@ -9,3 +9,6 @@ projectile-bookmarks.eld
 request
 *.el.gpg
 transient
+/.lsp-session-v1
+/.persistent-scratch
+/elpy/*.py
