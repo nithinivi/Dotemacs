@@ -1,11 +1,20 @@
 (windmove-default-keybindings)
-(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default nil :height 125
+
+                    )
+(setq exec-path-from-shell-check-startup-files -1)
 
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config
-  (load-theme 'manoj-dark)
+  ;;(load-theme 'deeper-blue)
   )
+
+(use-package color-theme-sanityinc-solarized
+  :load-path "~/.emacs.d/package/hemisu-theme/"
+  ;;(load-theme 'hemisu-light-theme)
+  )
+
 
 
 (use-package powerline
@@ -49,19 +58,6 @@
   (global-aggressive-indent-mode 1)
   (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
 
-
-;; (use-package company
-;;   :ensure t
-;;   :bind ("C-M-;" . company-complete)
-;;   :config
-;;   (setq company-idle-delay 0)
-;;   (setq company-minimum-prefix-length 2)
-;;   (setq company-selection-wrap-around t)
-;;   (company-tng-configure-default)
-
-;;   )
-
-;; (add-hook 'after-init-hook 'global-company-mode)
 ;;exec
 ;;============================================================================
 (use-package exec-path-from-shell
@@ -71,37 +67,37 @@
   (setq exec-path-from-shell-variables '("PATH" "GOPATH" "GOROOT" "GOBIN"))
   (exec-path-from-shell-initialize))
 
-;;golang
-;;============================================================================
+;; ;;golang
+;; ;;============================================================================
 
-(use-package go-mode
-  :ensure t)
-(use-package go-eldoc
-  :ensure t)
-(use-package company-go
-  :ensure t)
-(setq gofmt-command "goimports")
-;; UPDATE: gofmt-before-save is more convenient then having a command
-;; for running gofmt manually. In practice, you want to
-;; gofmt/goimports every time you save anyways.
-(add-hook 'before-save-hook 'gofmt-before-save)
+;; (use-package go-mode
+;;   :ensure t)
+;; (use-package go-eldoc
+;;   :ensure t)
+;; (use-package company-go
+;;   :ensure t)
+;; (setq gofmt-command "goimports")
+;; ;; UPDATE: gofmt-before-save is more convenient then having a command
+;; ;; for running gofmt manually. In practice, you want to
+;; ;; gofmt/goimports every time you save anyways.
+;; (add-hook 'before-save-hook 'gofmt-before-save)
 
-(global-set-key (kbd "?\t") 'company-complete)
+;; (global-set-key (kbd "?\t") 'company-complete)
 
 
-(defun my-go-mode-hook ()
-  ;; UPDATE: I commented the next line out because it isn't needed
-  ;; with the gofmt-before-save hook above.
-  ;; (local-set-key (kbd "C-c m") 'gofmt)
-  (local-set-key (kbd "M-.") 'godef-jump))
-(add-hook 'go-mode-hook (lambda ()
-                          (set (make-local-variable 'company-backends) '(company-go))
-                          (company-mode)))
+;; (defun my-go-mode-hook ()
+;;   ;; UPDATE: I commented the next line out because it isn't needed
+;;   ;; with the gofmt-before-save hook above.
+;;   ;; (local-set-key (kbd "C-c m") 'gofmt)
+;;   (local-set-key (kbd "M-.") 'godef-jump))
+;; (add-hook 'go-mode-hook (lambda ()
+;;                           (set (make-local-variable 'company-backends) '(company-go))
+;;                           (company-mode)))
 
-(add-hook 'go-mode-hook 'my-go-mode-hook)
-(add-hook 'go-mode-hook 'go-eldoc-setup)
-(add-hook 'go-mode-hook 'company-mode)
-(add-hook 'go-mode-hook 'yas-minor-mode)
+;; (add-hook 'go-mode-hook 'my-go-mode-hook)
+;; (add-hook 'go-mode-hook 'go-eldoc-setup)
+;; (add-hook 'go-mode-hook 'company-mode)
+;; (add-hook 'go-mode-hook 'yas-minor-mode)
 
 
 
@@ -121,8 +117,8 @@
   :ensure t
   )
 
-(use-package restclient
-  :load-path "~/.emacs.d/package/restclient")
+;; (use-package restclient
+;;   :load-path "~/.emacs.d/package/restclient")
 
 ;;dired-mode
 ;;===========================================D=================================
@@ -181,3 +177,24 @@
   (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
 
   )
+
+;;org mode
+;;============================================================================
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  )
+
+;; markdown mode
+;;============================================================================
+
+
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
