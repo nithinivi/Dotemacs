@@ -70,36 +70,104 @@
 ;; ;;golang
 ;; ;;============================================================================
 
-;; (use-package go-mode
-;;   :ensure t)
-;; (use-package go-eldoc
-;;   :ensure t)
-;; (use-package company-go
-;;   :ensure t)
-;; (setq gofmt-command "goimports")
-;; ;; UPDATE: gofmt-before-save is more convenient then having a command
-;; ;; for running gofmt manually. In practice, you want to
-;; ;; gofmt/goimports every time you save anyways.
-;; (add-hook 'before-save-hook 'gofmt-before-save)
-
-;; (global-set-key (kbd "?\t") 'company-complete)
 
 
-;; (defun my-go-mode-hook ()
-;;   ;; UPDATE: I commented the next line out because it isn't needed
-;;   ;; with the gofmt-before-save hook above.
-;;   ;; (local-set-key (kbd "C-c m") 'gofmt)
-;;   (local-set-key (kbd "M-.") 'godef-jump))
-;; (add-hook 'go-mode-hook (lambda ()
-;;                           (set (make-local-variable 'company-backends) '(company-go))
-;;                           (company-mode)))
 
-;; (add-hook 'go-mode-hook 'my-go-mode-hook)
-;; (add-hook 'go-mode-hook 'go-eldoc-setup)
-;; (add-hook 'go-mode-hook 'company-mode)
-;; (add-hook 'go-mode-hook 'yas-minor-mode)
+(use-package go-mode
+  :ensure t
+  :config
+  (autoload 'go-mode "go-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+  )
+
+;;
 
 
+
+
+(use-package gorepl-mode
+  :ensure t
+  :config
+  (add-hook 'go-mode-hook #'gorepl-mode))
+
+(use-package go-playground
+  :ensure t
+  )
+
+;;lsp-support
+(add-hook 'go-mode-hook 'lsp-deferred)
+
+(defun set-exec-path-from-shell-PATH ()
+  (let ((path-from-shell (replace-regexp-in-string
+                          "[ \t\n]*$"
+                          ""
+                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+    (setenv "PATH" path-from-shell)
+    (setq eshell-path-env path-from-shell) ; for eshell users
+    (setq exec-path (split-string path-from-shell path-separator)))
+  )
+
+(when window-system (set-exec-path-from-shell-PATH))
+(setenv "GOPATH" "/home/nithin/go")
+
+
+
+(add-to-list 'exec-path "/home/nithin/go/bin")
+(add-hook 'before-save-hook 'gofmt-before-save)
+
+
+
+(defun auto-complete-for-go ()
+  (auto-complete-mode 1)
+  (flymake-mode 1)
+  (flycheck-mode 1)
+  (yas-minor-mode 1)
+  )
+(add-hook 'go-mode-hook 'auto-complete-for-go)
+
+
+;; (use-package go-autocomplete
+;;   :ensure t go-autocomplete)
+
+;; (with-eval-after-load 'go-mode
+;;   (require 'go-autocomplete))
+
+
+;; build
+
+;; go imports
+
+(defun my-go-var-shortcut ()
+  (interactive)
+  (insert " := "))
+
+(defun my-go-mode-hook ()
+                                        ; Use goimports instead of go-fmt
+  (setq gofmt-command "goimports")
+                                        ; Call Gofmt before saving
+  (add-hook 'before-save-hook 'gofmt-before-save)
+                                        ; Customize compile command to run go build
+  (if (not (string-match "go" compile-command))
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+                                        ; Godef jump key binding
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "M-*") 'pop-tag-mark)
+  (local-set-key (kbd "C-;") 'my-go-var-shortcut)
+  (local-set-key (kbd "<C-return>") 'compile)
+  )
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+
+
+;; company mode support
+
+(use-package company-go
+  :ensure t)
+
+(add-hook 'go-mode-hook
+          (lambda ()
+            (set (make-local-variable 'company-backends) '(company-go))
+            (company-mode)))
 
 
 
@@ -111,14 +179,22 @@
   :config
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.api\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("/some/react/path/.*\\.js[x]?\\'" . web-mode))
+
+  (setq web-mode-content-types-alist
+        '(("json" . "/some/path/.*\\.api\\'")
+          ("xml"  . "/other/path/.*\\.api\\'")
+          ("jsx"  . "/some/react/path/.*\\.js[x]?\\'")))
 
   )
 (use-package emmet-mode
   :ensure t
-  )
+  :hook (html-mode . emmet-mode))
 
-;; (use-package restclient
-;;   :load-path "~/.emacs.d/package/restclient")
+(use-package restclient
+  :ensure t)
 
 ;;dired-mode
 ;;===========================================D=================================
@@ -135,6 +211,27 @@
 (setq auto-revert-verbose nil)
 (setq dried-dwim-target t)
 
+
+
+
+;; lsp  configrations
+;;============================================================================
+
+
+(use-package lsp-mode
+  :ensure t
+  :hook (python-mode . lsp)
+  :commands lsp)
+
+;; optionally
+(use-package lsp-ui :ensure t :commands lsp-ui-mode)
+(use-package company-lsp :ensure t :commands company-lsp)
+(use-package flycheck
+  :ensure t
+  :hook (python-mode-hook . flycheck-mode)
+  )
+
+(add-hook 'go-mode-hook #'lsp-deferred)
 
 
 ;;sql specific
@@ -186,6 +283,28 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   )
+(progn
+  ;; org-mode setup
+
+  ;; when opening a org file, don't collapse headings
+  (setq org-startup-folded nil)
+
+  ;; wrap long lines. don't let it disappear to the right
+  (setq org-startup-truncated nil)
+
+  ;; when in a url link, enter key should open it
+  (setq org-return-follows-link t)
+
+  ;; make org-mode” syntax color embedded source code
+  (setq org-src-fontify-natively t)
+
+  ;;
+  )
+
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)))
 
 ;; markdown mode
 ;;============================================================================
@@ -198,3 +317,47 @@
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
+
+;; JS mode
+;;============================================================================
+
+
+(use-package js2-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  ;; Better imenu
+  (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+  ())
+
+
+
+(use-package xref-js2
+  :ensure t)
+
+(use-package js2-refactor
+  :ensure t
+  :config
+  (add-hook 'js2-mode-hook #'js2-refactor-mode)
+  (js2r-add-keybindings-with-prefix "C-c C-r")
+  (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+  (define-key js-mode-map (kbd "M-.") nil)
+
+  (add-hook 'js2-mode-hook (lambda ()
+                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
+
+
+
+(autoload 'js2-mode "js2-mode" nil t)
+(autoload 'js2-jsx-mode "js2-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-jsx-mode))
+;;(add-to-list 'auto-mode-alist '("\\.jsx$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . js2-mode))
+
+(custom-set-variables '(js2-strict-inconsistent-return-warning nil))
+(custom-set-variables '(js2-strict-missing-semi-warning nil))
+
+(use-package indium
+  :ensure t)
+;;============================================================================

@@ -111,10 +111,12 @@ might be bad."
   :ensure t)
 
 (use-package counsel
-  :ensure t
-  :bind ("M-x" . counsel-M-x)
-  :chords (("yy" . counsel-yank-pop))
-  )
+  :bind
+  ("M-x" . counsel-M-x)
+  (("M-y" . counsel-yank-pop)
+   :map ivy-minibuffer-map
+   ("M-y" . ivy-next-line)))
+
 
 (use-package swiper
   :ensure t
@@ -145,11 +147,21 @@ might be bad."
   (counsel-projectile-mode)
   )
 
+
+;;https://joaotavora.github.io/yasnippet/snippet-expansion.html
 (use-package yasnippet-snippets
   :ensure t
   :config
-  (setq yas-snippet-dirs '("~/.emacs.d/elpa/yasnippet-snippets-0.16/snippets/"))
+  (progn
+    (setq yas-snippet-dirs '("~/.emacs.d/elpa/yasnippet-snippets-0.16/snippets/"))
+    (define-key yas-minor-mode-map (kbd "<tab>") nil)
+    (define-key yas-minor-mode-map (kbd "TAB") nil)
+    (define-key yas-minor-mode-map (kbd "S-SPC") yas-maybe-expand)
+    ;; Bind `C-c y' to `yas-expand' ONLY.
+    (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand)
+    ( yas-global-mode 1))
   )
+
 
 (use-package magit
   :ensure t
@@ -205,22 +217,6 @@ might be bad."
 
   (persistent-scratch-autosave-mode 1))
 
-
-;; lsp  configrations
-;;============================================================================
-
-
-(use-package lsp-mode
-  :ensure t
-  :hook (python-mode . lsp)
-  :commands lsp)
-
-;; optionally
-(use-package lsp-ui :ensure t :commands lsp-ui-mode)
-(use-package company-lsp :ensure t :commands company-lsp)
-(use-package flycheck
-  :ensure t
-  :hook (python-mode-hook . flycheck-mode))
 ;; python  configrations
 ;;============================================================================
 (use-package conda
@@ -300,6 +296,13 @@ might be bad."
 (unless (server-running-p)
   (server-start))
 
+                                        ; shell configrations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
+                                        ; comment ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (when window-system
@@ -318,12 +321,14 @@ might be bad."
    (vector "#839496" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#002b36"))
  '(custom-safe-themes
    (quote
-    ("7feeed063855b06836e0262f77f5c6d3f415159a98a9676d549bfeb6c49637c4" "c1fb68aa00235766461c7e31ecfc759aa2dd905899ae6d95097061faeb72f9ee" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
+    ("77bd459212c0176bdf63c1904c4ba20fce015f730f0343776a1a14432de80990" "7feeed063855b06836e0262f77f5c6d3f415159a98a9676d549bfeb6c49637c4" "c1fb68aa00235766461c7e31ecfc759aa2dd905899ae6d95097061faeb72f9ee" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
  '(elpy-rpc-python-command "python3")
  '(fci-rule-color "#073642")
+ '(js2-strict-inconsistent-return-warning nil)
+ '(js2-strict-missing-semi-warning nil)
  '(package-selected-packages
    (quote
-    (persistent-scratch flycheck company-lsp lsp-ui lsp-mode hemisu-theme markdown-mode company-jedi virtualenvwrapper company-fuzzy web-mode use-package-chords undo-tree smex smartparens polymode org-bullets magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy dumb-jump counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag)))
+    (ess go-playground gorepl-mode auto-complete impatient-mode indium xref-js2 js2-refactor js2-mode jinja2-mode json-mode ejson-mode restclient persistent-scratch flycheck company-lsp lsp-ui lsp-mode hemisu-theme markdown-mode company-jedi virtualenvwrapper company-fuzzy web-mode use-package-chords undo-tree smex smartparens polymode org-bullets magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy dumb-jump counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag)))
  '(python-shell-interpreter "python3.7")
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
