@@ -1,5 +1,5 @@
 (windmove-default-keybindings)
-(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default nil :height 150)
 
 (use-package color-theme-sanityinc-solarized
   :ensure t
