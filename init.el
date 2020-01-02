@@ -1,13 +1,26 @@
 (require 'package)
-(require 'json)
-(add-to-list 'package-archives
-             '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                    (not (gnutls-available-p))))
+       (proto (if no-ssl "http" "https")))
+  (when no-ssl
+    (warn "\
+Your version of Emacs does not support SSL connections,
+which is unsafe because it allows man-in-the-middle attacks.
+There are two things you can do about this warning:
+1. Install an Emacs version that does support SSL and be safe.
+2. Remove this warning from your init file so you won't see it again."))
+  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
+  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+  (when (< emacs-major-version 24)
+    ;; For important compatibility libraries like cl-lib
+    (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-
+(setq package-check-signature nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; Keep all backup and auto-save files in one directory
@@ -63,6 +76,10 @@ might be bad."
 ;; Various superfluous white-space. Just say no.
 (add-hook 'before-save-hook 'cleanup-buffer-safe)
 
+
+
+;; python
+(setq python-shell-interpreter "python3")
 ;;General packages
 ;;============================================================================
 
@@ -98,10 +115,12 @@ might be bad."
   :ensure t)
 
 (use-package counsel
-  :ensure t
-  :bind ("M-x" . counsel-M-x)
-  :chords (("yy" . counsel-yank-pop))
-  )
+  :bind
+  ("M-x" . counsel-M-x)
+  (("M-y" . counsel-yank-pop)
+   :map ivy-minibuffer-map
+   ("M-y" . ivy-next-line)))
+
 
 (use-package swiper
   :ensure t
@@ -109,7 +128,7 @@ might be bad."
 
 (use-package undo-tree
   :ensure t
-  :chords (("uu" . undo-tree-visualize))
+  :chords (("uuuu" . undo-tree-visualize))
   :diminish undo-tree-mode:
   :config
   (global-undo-tree-mode 1)
@@ -132,8 +151,24 @@ might be bad."
   (counsel-projectile-mode)
   )
 
+
+;;https://joaotavora.github.io/yasnippet/snippet-expansion.html
 (use-package yasnippet-snippets
-  :ensure t)
+  :ensure t
+  :config
+  (progn
+    (setq yas-snippet-dirs '("~/.emacs.d/elpa/yasnippet-snippets-0.17/snippets/"
+                             ;;,"~/.emacs.d/elpa/yasnippet-snippets-0.16/snippets"
+                             ))
+
+    (define-key yas-minor-mode-map (kbd "<tab>") nil)
+    (define-key yas-minor-mode-map (kbd "TAB") nil)
+    (define-key yas-minor-mode-map (kbd "S-SPC") yas-maybe-expand)
+    ;; Bind `C-c y' to `yas-expand' ONLY.
+    (define-key yas-minor-mode-map (kbd "C-<") #'yas-expand)
+    ( yas-global-mode 1))
+  )
+
 
 (use-package magit
   :ensure t
@@ -154,7 +189,40 @@ might be bad."
   :ensure t
   :config
   (smartparens-global-mode t) )
+;; autocomplete  configrations
+;;============================================================================
 
+;; (use-package company-fuzzy
+;;   :load-path  "~/.emacs.d/package/company-fuzzy"
+;;   )
+(use-package company-jedi
+  :ensure t)
+
+(use-package company
+  :ensure t
+  :bind ("C-M-;" . company-complete)
+  :config
+
+  (global-company-mode t)
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 3)
+  (setq company-quickhelp-delay 0)
+  (setq company-selection-wrap-around t)
+  ;;(company-quickhelp-mode 1)
+  (company-tng-configure-default)
+  ;;(global-company-fuzzy-mode 1)
+  (add-to-list 'company-backends 'company-jedi)
+  )
+
+(add-hook 'after-init-hook 'global-company-mode)
+;; scratch buffer  configrations
+;;============================================================================
+
+(use-package persistent-scratch
+  :ensure t
+  :config
+
+  (persistent-scratch-autosave-mode 1))
 
 ;; python  configrations
 ;;============================================================================
@@ -235,6 +303,13 @@ might be bad."
 (unless (server-running-p)
   (server-start))
 
+                                        ; shell configrations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
+                                        ; comment ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (when window-system
@@ -248,12 +323,41 @@ might be bad."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline bold bold-italic bold])
+ '(ansi-color-names-vector
+   (vector "#839496" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#002b36"))
  '(custom-safe-themes
    (quote
     ("4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
+ '(fci-rule-color "#073642")
+ '(js2-strict-inconsistent-return-warning nil)
+ '(js2-strict-missing-semi-warning nil)
  '(package-selected-packages
    (quote
-    (js2-mode polymode restclient restclinet yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens nlinum magit ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy ein dumb-jump dockerfile-mode docker counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag))))
+    (neotree company-tern racket-mode indium js2-refactor xref-js2 org-bullets flycheck company-lsp lsp-ui lsp-mode restclient go-playground gorepl-mode persistent-scratch company-jedi yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens magit js2-mode ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy dumb-jump counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag)))
+ '(vc-annotate-background nil)
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#dc322f")
+     (40 . "#cb4b16")
+     (60 . "#b58900")
+     (80 . "#859900")
+     (100 . "#2aa198")
+     (120 . "#268bd2")
+     (140 . "#d33682")
+     (160 . "#6c71c4")
+     (180 . "#dc322f")
+     (200 . "#cb4b16")
+     (220 . "#b58900")
+     (240 . "#859900")
+     (260 . "#2aa198")
+     (280 . "#268bd2")
+     (300 . "#d33682")
+     (320 . "#6c71c4")
+     (340 . "#dc322f")
+     (360 . "#cb4b16"))))
+ '(vc-annotate-very-old-color nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
