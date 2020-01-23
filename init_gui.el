@@ -35,6 +35,18 @@
 
 (global-set-key (kbd "C-=") 'hs-toggle-hiding)
 
+
+;;modeline programming
+;;============================================================================
+
+
+(use-package minions
+  :config
+  (setq minions-mode-line-lighter ""
+        minions-mode-line-delimiters '("" . ""))
+  (minions-mode 1))
+
+
 ;;genral programming
 ;;============================================================================
 
@@ -66,110 +78,215 @@
   (setq exec-path-from-shell-variables '("PATH" "GOPATH" "GOROOT" "GOBIN"))
   (exec-path-from-shell-initialize))
 
-(add-to-list 'exec-path "~/gocode/bin")
-(add-hook 'before-save-hook 'gofmt-before-save)
+(add-to-list 'exec-path "~/go_code/bin")
+
 
 ;; ;;golang
 ;; ;;============================================================================
 
 
+(defvar go-tab-width 8
+  "Set the `tab-width' in Go mode. Default is 8.")
+
+(defvar go-use-gometalinter nil
+  "Use gometalinter if the variable has non-nil value.")
 
 
-(use-package go-mode
-  :ensure t
-  :config
-  (autoload 'go-mode "go-mode" nil t)
-  (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
-  )
-
-;;
-
-
-
-
-(use-package gorepl-mode
-  :ensure t
-  :config
-  (add-hook 'go-mode-hook #'gorepl-mode))
-
-(use-package go-playground
-  :ensure t
-  )
-
-;;lsp-support
-(add-hook 'go-mode-hook 'lsp-deferred)
-
-(defun set-exec-path-from-shell-PATH ()
-  (let ((path-from-shell (replace-regexp-in-string
-                          "[ \t\n]*$"
-                          ""
-                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
-    (setenv "PATH" path-from-shell)
-    (setq eshell-path-env path-from-shell) ; for eshell users
-    (setq exec-path (split-string path-from-shell path-separator)))
-  )
-
-(when window-system (set-exec-path-from-shell-PATH))
-(setenv "GOPATH" "/home/nithin/go")
+(defun my-go-mode-hook ()
+																				; Use goimports instead of go-fmt
+  (setq gofmt-command "goimports")
+																				; Call Gofmt before saving
+																				; Customize compile command to run go build
+  (if (not (string-match "go" compile-command))
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+																				; Godef jump key binding
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "M-*") 'pop-tag-mark)
+	)
 
 
 
-(add-to-list 'exec-path "/home/nithin/go/bin")
-(add-hook 'before-save-hook 'gofmt-before-save)
-
-
-
-(defun auto-complete-for-go ()
-  (auto-complete-mode 1)
-  (flymake-mode 1)
-  (flycheck-mode 1)
-  (yas-minor-mode 1)
-  )
-(add-hook 'go-mode-hook 'auto-complete-for-go)
-
-
-;; (use-package go-autocomplete
-;;   :ensure t go-autocomplete)
-
-;; (with-eval-after-load 'go-mode
-;;   (require 'go-autocomplete))
-
-
-;; build
-
-;; go imports
+(defun spacemacs//go-enable-gometalinter ()
+  "Enable `flycheck-gometalinter' and disable overlapping `flycheck' linters."
+  (setq flycheck-disabled-checkers '(go-gofmt
+																		 go-golint
+																		 go-vet
+																		 go-build
+																		 go-test
+																		 go-errcheck)
+				)
+	)
 
 (defun my-go-var-shortcut ()
   (interactive)
   (insert " := "))
 
-(defun my-go-mode-hook ()
-                                        ; Use goimports instead of go-fmt
-  (setq gofmt-command "goimports")
-                                        ; Call Gofmt before saving
-  (add-hook 'before-save-hook 'gofmt-before-save)
-                                        ; Customize compile command to run go build
-  (if (not (string-match "go" compile-command))
-      (set (make-local-variable 'compile-command)
-           "go build -v && go test -v && go vet"))
-                                        ; Godef jump key binding
-  (local-set-key (kbd "M-.") 'godef-jump)
-  (local-set-key (kbd "M-*") 'pop-tag-mark)
-  (local-set-key (kbd "C-;") 'my-go-var-shortcut)
-  (local-set-key (kbd "<C-return>") 'compile)
-  )
-(add-hook 'go-mode-hook 'my-go-mode-hook)
+(use-package go-mode
+  :ensure t
+  :init
+  (progn
+    (autoload 'go-mode "go-mode" nil t)
+    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+    (if (executable-find "goimports")
+        (setq gofmt-command "goimports"))
+    (setq-local tab-width go-tab-width)
+    )
+  :config
+	(progn
+		(add-hook 'before-save-hook 'gofmt-before-save))
+	:hook (go-mode-hook . my-go-mode-hook)
+	:bind
+	(:map go-mode-map
+				("C-;" . my-go-var-shortcut))
+	)
+
+;; (use-package company-go
+;;   :ensure t
+;;   :defer t
+;;   :init
+;;   (progn
+;;     (setq company-go-show-annotation t)))
 
 
-;; company mode support
+(use-package flycheck-gometalinter
+	:defer t
+	:init
+	(add-hook 'go-mode-hook 'spacemacs//go-enable-gometalinter t))
 
-(use-package company-go
-  :ensure t)
 
-(add-hook 'go-mode-hook
-          (lambda ()
-            (set (make-local-variable 'company-backends) '(company-go))
-            (company-mode)))
+(use-package go-complete
+  :ensure t
+	;;(add-hook 'completion-at-point-functions 'go-complete-at-point)
+	:hook
+	(completion-at-point-functions . go-complete-at-point)
+	)
+
+
+
+;; ;; _______________________________________________________________________________
+
+
+
+;; (defun my-go-mode-hook ()
+;;                                         ; Use goimports instead of go-fmt
+;;   (setq gofmt-command "goimports")
+;;   (if (not (string-match "go" compile-command))
+;;       (set (make-local-variable 'compile-command)
+;;            "go build -v && go test -v && go vet"))
+;;                                         ; Godef jump key binding
+;;   (local-set-key (kbd "M-.") 'godef-jump)
+;;   (local-set-key (kbd "M-*") 'pop-tag-mark)
+;;   (local-set-key (kbd "C-;") 'my-go-var-shortcut)
+;;   (local-set-key (kbd "<C-return>") 'compile)
+;;   )
+
+
+
+
+(remove-hook 'go-mode-hook 'flymake-mode)
+;;(add-hook 'go-mode-hook 'company-mode )
+(add-hook 'go-mode-hook 'flycheck-mode)
+
+
+(flymake-mode -1)
+
+
+;; (use-package gorepl-mode
+;;   :ensure t
+;;   :config
+;;   (add-hook 'go-mode-hook #'gorepl-mode)
+;;   )
+
+;; (use-package go-playground
+;;   :ensure t
+;;   )
+
+;; (defun set-exec-path-from-shell-PATH ()
+;;   (let ((path-from-shell (replace-regexp-in-string
+;;                           "[ \t\n]*$"
+;;                           ""
+;;                           (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+;;     (setenv "PATH" path-from-shell)
+;;     (setq eshell-path-env path-from-shell) ; for eshell users
+;;     (setq exec-path (split-string path-from-shell path-separator)))
+;;   )
+
+;; (when window-system (set-exec-path-from-shell-PATH))
+;; (setenv "GOPATH" "/home/nithin/go_code/")
+;; (add-to-list 'exec-path "/home/nithin/go_code/bin")
+
+
+;; ;; (defun auto-complete-for-go ()
+;; ;;   (auto-complete-mode 1)
+;; ;;   (flymake-mode 1)
+;; ;;   (flycheck-mode 1)
+;; ;;   (yas-minor-mode 1)
+;; ;;   )
+;; ;; (add-hook 'go-mode-hook 'auto-complete-for-go)
+;; (use-package go-guru
+;;   :ensure t
+;;   :config
+;;   (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode)
+;;   )
+
+;; (use-package go-autocomplete
+;;   :ensure t
+;;   :config
+;;   (with-eval-after-load 'go-mode
+;;     (require 'go-autocomplete)
+;;     )
+;;   )
+
+
+;; (defun my-go-var-shortcut ()
+;;   (interactive)
+;;   (insert " := "))
+
+;; (defun my-go-mode-hook ()
+;;                                         ; Use goimports instead of go-fmt
+;;   (setq gofmt-command "goimports")
+;;                                         ; Call Gofmt before saving
+;;   (add-hook 'before-save-hook 'gofmt-before-save)
+;;                                         ; Customize compile command to run go build
+;;   (if (not (string-match "go" compile-command))
+;;       (set (make-local-variable 'compile-command)
+;;            "go build -v && go test -v && go vet"))
+;;                                         ; Godef jump key binding
+
+;;   (local-set-key (kbd "M-.") 'godef-jump)
+;;   (local-set-key (kbd "M-*") 'pop-tag-mark)
+;;   (local-set-key (kbd "C-;") 'my-go-var-shortcut)
+;;   (local-set-key (kbd "<C-return>") 'compile)
+;;   )
+
+
+;; (add-hook 'go-mode-hook 'my-go-mode-hook)
+
+;; ;; (defun my-go-mode-hook ()
+;; ;; 					; Use goimports instead of go-fmt
+;; ;;   (setq gofmt-command "goimports")
+;; ;; 					; Call Gofmt before saving
+;; ;;   (add-hook 'before-save-hook 'gofmt-before-save)
+;; ;; 					; Customize compile command to run go build
+;; ;;   (if (not (string-match "go" compile-command))
+;; ;;       (set (make-local-variable 'compile-command)
+;; ;;            "go build -v && go test -v && go vet"))
+;; ;; 					; Godef jump key binding
+;; ;;   (local-set-key (kbd "M-.") 'godef-jump)
+;; ;;   (local-set-key (kbd "M-*") 'pop-tag-mark)
+;; ;;   )
+;; ;; (add-hook 'go-mode-hook 'my-go-mode-hook)
+
+;; ;; company mode support
+
+;; (use-package company-go
+;;   :ensure t)
+
+;; (add-hook 'go-mode-hook
+;;           (lambda ()
+;;             (set (make-local-variable 'company-backends) '(company-go))
+;;             (company-mode)))
 
 
 
@@ -186,9 +303,9 @@
   (add-to-list 'auto-mode-alist '("/some/react/path/.*\\.js[x]?\\'" . web-mode))
 
   (setq web-mode-content-types-alist
-        '(("json" . "/some/path/.*\\.api\\'")
-          ("xml"  . "/other/path/.*\\.api\\'")
-          ("jsx"  . "/some/react/path/.*\\.js[x]?\\'")))
+				'(("json" . "/some/path/.*\\.api\\'")
+					("xml"  . "/other/path/.*\\.api\\'")
+					("jsx"  . "/some/react/path/.*\\.js[x]?\\'")))
 
   )
 (use-package emmet-mode
@@ -223,11 +340,14 @@
 (use-package lsp-mode
   :ensure t
   :hook (python-mode . lsp)
+  :hook (go-mode . lsp)
   :commands lsp)
 
 ;; optionally
 (use-package lsp-ui :ensure t :commands lsp-ui-mode)
+
 (use-package company-lsp :ensure t :commands company-lsp)
+
 (use-package flycheck
   :ensure t
   :hook (python-mode-hook . flycheck-mode)
@@ -244,7 +364,8 @@
                  (sql-server "localhost")
                  (sql-user "nithin")
                  (sql-database "kyc"))
-        ))
+        )
+			)
 
 (defun my-sql-connect (product connection)
   ;; load the password
@@ -260,7 +381,8 @@
 
   ;; connect to database
   (setq sql-product product)
-  (sql-connect connection))
+  (sql-connect connection)
+	)
 
 
 ;; Projectile mode
@@ -285,24 +407,23 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   )
-(progn
-  ;; org-mode setup
 
-  ;; when opening a org file, don't collapse headings
-  (setq org-startup-folded nil)
+;; when opening a org file, don't collapse headings
+(setq org-startup-folded nil)
 
-  ;; wrap long lines. don't let it disappear to the right
-  (setq org-startup-truncated nil)
+;; wrap long lines. don't let it disappear to the right
+(setq org-startup-truncated nil)
 
-  ;; when in a url link, enter key should open it
-  (setq org-return-follows-link t)
+;; when in a url link, enter key should open it
+(setq org-return-follows-link t)
 
-  ;; make org-mode” syntax color embedded source code
-  (setq org-src-fontify-natively t)
+;; make org-mode” syntax color embedded source code
+(setq org-src-fontify-natively t)
 
-  ;;
-  )
+;;
 
+;; (use-package ox-beamer
+;;   :ensure t)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -316,8 +437,8 @@
   :ensure t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
+				 ("\\.md\\'" . markdown-mode)
+				 ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
 ;; JS mode
@@ -347,7 +468,7 @@
   (define-key js-mode-map (kbd "M-.") nil)
 
   (add-hook 'js2-mode-hook (lambda ()
-                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
+														 (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
 
 
 
@@ -368,8 +489,8 @@
 
 (add-to-list 'company-backends 'company-tern)
 (add-hook 'js2-mode-hook (lambda ()
-                           (tern-mode)
-                           (company-mode)))
+													 (tern-mode)
+													 (company-mode)))
 
 (define-key tern-mode-keymap (kbd "M-.") nil)
 (define-key tern-mode-keymap (kbd "M-,") nil)
@@ -381,3 +502,23 @@
   :ensure t
   :config
   (global-set-key [f8] 'neotree-toggle))
+
+;; relative nliunm mode
+;;============================================================================
+
+(use-package nlinum
+  :ensure t
+  :bind ("M-[" . nlinum-mode)
+  )
+
+
+;; (use-package nlinum-relative
+;;   :ensure t
+;;   :config
+;;   ;; something else you want
+;;   (nlinum-relative-setup-evil)
+
+;;   (setq nlinum-relative-redisplay-delay 0)      ;; delay
+;;   (setq nlinum-relative-current-symbol "->")      ;; or "" for display current line number
+;;   (setq nlinum-relative-offset 0)
+;;   (add-hook 'prog-mode-hook 'nlinum-relative-mode))

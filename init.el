@@ -26,7 +26,6 @@ There are two things you can do about this warning:
 ;; Keep all backup and auto-save files in one directory
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
-(add-hook 'before-save-hook (lambda () (delete-trailing-whitespace)))
 
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
@@ -36,10 +35,6 @@ There are two things you can do about this warning:
 (setq column-number-mode 1)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message "")
-
-
-(bind-key  "M-+" 'text-scale-increase)
-(bind-key  "M--" 'text-scale-decrease)
 
 
 
@@ -55,33 +50,38 @@ There are two things you can do about this warning:
 
 ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
-(set-face-attribute 'default nil :height 155)
+;; (set-face-attribute 'default nil :height 155)
+
+(setq dired-dwim-target t)
+
+(defun cleanup-buffer-safe ()
+  (interactive)
+  (untabify (point-min) (point-max))
+  (delete-trailing-whitespace)
+  (set-buffer-file-coding-system 'utf-8))
+
+;; Various superfluous white-space. Just say no.
+(add-hook 'before-save-hook 'cleanup-buffer-safe)
+
+;;General shortcuts 
+;;============================================================================
+
+
+(bind-key  "M-+" 'text-scale-increase)
+(bind-key  "M--" 'text-scale-decrease)
 
 
 (global-set-key (kbd "C-M-.") 'forward-sexp )
 (global-set-key (kbd "C-M-,") 'backward-sexp)
 
 (global-set-key (kbd "C-c d") 'kill-whole-line)
-(setq dired-dwim-target t)
-
-(defun cleanup-buffer-safe ()
-  "Perform a bunch of safe operations on the whitespace content of a buffer.
-Does not indent buffer, because it is used for a before-save-hook, and that
-might be bad."
-  (interactive)
-  (untabify (point-min) (point-max))
-  ;;  (delete-trailing-whitespace)
-  (set-buffer-file-coding-system 'utf-8))
-
-;; Various superfluous white-space. Just say no.
-(add-hook 'before-save-hook 'cleanup-buffer-safe)
 
 
-
-;; python
-(setq python-shell-interpreter "python3")
 ;;General packages
 ;;============================================================================
+
+;; (use-package  aweshell
+;;   :ensure t )
 
 ;; (use-package exec-path-from-shell
 ;;   :ensure t
@@ -128,7 +128,7 @@ might be bad."
 
 (use-package undo-tree
   :ensure t
-  :chords (("uuuu" . undo-tree-visualize))
+  :chords (("iii" . undo-tree-visualize))
   :diminish undo-tree-mode:
   :config
   (global-undo-tree-mode 1)
@@ -165,7 +165,7 @@ might be bad."
     (define-key yas-minor-mode-map (kbd "TAB") nil)
     (define-key yas-minor-mode-map (kbd "S-SPC") yas-maybe-expand)
     ;; Bind `C-c y' to `yas-expand' ONLY.
-    (define-key yas-minor-mode-map (kbd "C-<") #'yas-expand)
+    (define-key yas-minor-mode-map (kbd "M-]") #'yas-expand)
     ( yas-global-mode 1))
   )
 
@@ -226,6 +226,12 @@ might be bad."
 
 ;; python  configrations
 ;;============================================================================
+
+
+;; python
+(setq python-shell-interpreter "python3")
+
+
 (use-package conda
   :ensure t
   :init
@@ -250,20 +256,33 @@ might be bad."
         (highlight-indentation-mode))
   )
 
+
 (use-package elpy
 
   :ensure t
   :config
   (elpy-enable)
   (add-hook 'python-mode-hook 'python-buffer-mode)
-)
+  (setq python-shell-interpreter "ipython"
+	python-shell-interpreter-args "-i --simple-prompt")
+  )
 
 
-;; (remove-hook 'elpy-modules 'elpy-module-flymake)
+(remove-hook 'elpy-modules 'elpy-module-flymake)
 ;; (global-set-key (kbd "C-;") 'yas-expand )
 ;; (setq highlight-indentation-mode nil)
 ;; (setq python-shell-interpreter "ipython")
 ;; ;;python-shell-interpreter-args "-i--simple-prompt")
+
+
+(defun my-python-mode-before-save-mode-hook()
+  (interactive)
+  (when (eq major-mode 'python-mode)
+    (progn (cleanup-buffer-safe)
+           (elpy-format-code))))
+
+(add-hook 'before-save-hook 'my-python-mode-before-save-hook)
+
 
 (define-key python-mode-map (kbd "C-c r") 'python-shell-send-region )
 
@@ -335,7 +354,7 @@ might be bad."
  '(js2-strict-missing-semi-warning nil)
  '(package-selected-packages
    (quote
-    (neotree company-tern racket-mode indium js2-refactor xref-js2 org-bullets flycheck company-lsp lsp-ui lsp-mode restclient go-playground gorepl-mode persistent-scratch company-jedi yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens magit js2-mode ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy dumb-jump counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag)))
+    (go-guru go-autocomplete aweshell minions ox-beamer nlinum-relative nlinum nyan-mode neotree company-tern racket-mode indium js2-refactor xref-js2 org-bullets flycheck company-lsp lsp-ui lsp-mode restclient go-playground gorepl-mode persistent-scratch company-jedi yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens magit js2-mode ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy dumb-jump counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
