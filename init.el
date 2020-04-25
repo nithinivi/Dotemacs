@@ -1,20 +1,7 @@
 (require 'package)
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  (when no-ssl
-    (warn "\
-Your version of Emacs does not support SSL connections,
-which is unsafe because it allows man-in-the-middle attacks.
-There are two things you can do about this warning:
-1. Install an Emacs version that does support SSL and be safe.
-2. Remove this warning from your init file so you won't see it again."))
-  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("org" . "http://orgmode.org/elpa/")))
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -63,7 +50,7 @@ There are two things you can do about this warning:
 ;; Various superfluous white-space. Just say no.
 (add-hook 'before-save-hook 'cleanup-buffer-safe)
 
-;;General shortcuts 
+;;General shortcuts
 ;;============================================================================
 
 
@@ -77,7 +64,13 @@ There are two things you can do about this warning:
 (global-set-key (kbd "C-c d") 'kill-whole-line)
 
 
-;;General packages
+;;(global-set-key (kbd "C-w") 'kill-word)
+(global-set-key [f5] 'call-last-kbd-macro)
+
+
+(setq next-line-add-newlines t)
+
+;;Generel
 ;;============================================================================
 
 ;; (use-package  aweshell
@@ -166,7 +159,11 @@ There are two things you can do about this warning:
     (define-key yas-minor-mode-map (kbd "S-SPC") yas-maybe-expand)
     ;; Bind `C-c y' to `yas-expand' ONLY.
     (define-key yas-minor-mode-map (kbd "M-]") #'yas-expand)
-    ( yas-global-mode 1))
+    ( yas-global-mode 1)
+    (setq yas-snippet-dirs (append yas-snippet-dirs
+                                   '(yasnippet-snippets-dir)))
+
+    )
   )
 
 
@@ -201,10 +198,10 @@ There are two things you can do about this warning:
 (use-package company
   :ensure t
   :bind ("C-M-;" . company-complete)
+  :init (global-company-mode t)
   :config
 
-  (global-company-mode t)
-  (setq company-idle-delay 0)
+  (setq company-idle-delay .1)
   (setq company-minimum-prefix-length 3)
   (setq company-quickhelp-delay 0)
   (setq company-selection-wrap-around t)
@@ -264,7 +261,7 @@ There are two things you can do about this warning:
   (elpy-enable)
   (add-hook 'python-mode-hook 'python-buffer-mode)
   (setq python-shell-interpreter "ipython"
-	python-shell-interpreter-args "-i --simple-prompt")
+        python-shell-interpreter-args "-i --simple-prompt")
   )
 
 
@@ -280,8 +277,6 @@ There are two things you can do about this warning:
   (when (eq major-mode 'python-mode)
     (progn (cleanup-buffer-safe)
            (elpy-format-code))))
-
-(add-hook 'before-save-hook 'my-python-mode-before-save-hook)
 
 
 (define-key python-mode-map (kbd "C-c r") 'python-shell-send-region )
@@ -332,7 +327,9 @@ There are two things you can do about this warning:
 
 
 (when window-system
-  (load "~/.emacs.d/init_gui.el"))
+  (progn
+    (load "~/.emacs.d/init_gui.el")
+    (load "~/.emacs.d/init_projects.el")))
 
 (when (not window-system)
   (load "~/.emacs.d/init_terminal.el"))
@@ -342,41 +339,14 @@ There are two things you can do about this warning:
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default bold shadow italic underline bold bold-italic bold])
- '(ansi-color-names-vector
-   (vector "#839496" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#002b36"))
  '(custom-safe-themes
    (quote
-    ("4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
- '(fci-rule-color "#073642")
+    ("4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4555bf2b98f0ffef52bc4870f3014304b0e2ed22549c395dffc10af88d577791" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
  '(js2-strict-inconsistent-return-warning nil)
  '(js2-strict-missing-semi-warning nil)
  '(package-selected-packages
    (quote
-    (go-guru go-autocomplete aweshell minions ox-beamer nlinum-relative nlinum nyan-mode neotree company-tern racket-mode indium js2-refactor xref-js2 org-bullets flycheck company-lsp lsp-ui lsp-mode restclient go-playground gorepl-mode persistent-scratch company-jedi yasnippet-snippets web-mode use-package-chords undo-tree smex smartparens magit js2-mode ivy-hydra iedit go-eldoc git-timemachine git-gutter exec-path-from-shell emmet-mode elpy dumb-jump counsel-projectile conda company-go color-theme-sanityinc-solarized aggressive-indent ag)))
- '(vc-annotate-background nil)
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#dc322f")
-     (40 . "#cb4b16")
-     (60 . "#b58900")
-     (80 . "#859900")
-     (100 . "#2aa198")
-     (120 . "#268bd2")
-     (140 . "#d33682")
-     (160 . "#6c71c4")
-     (180 . "#dc322f")
-     (200 . "#cb4b16")
-     (220 . "#b58900")
-     (240 . "#859900")
-     (260 . "#2aa198")
-     (280 . "#268bd2")
-     (300 . "#d33682")
-     (320 . "#6c71c4")
-     (340 . "#dc322f")
-     (360 . "#cb4b16"))))
- '(vc-annotate-very-old-color nil))
+    (terminal-here mmm-mode ox-publish vmd-mode ox-gfm imenus imenu-anywhere material-theme go-autocomplete yasnippet-snippets yaml-mode xref-js2 which-key web-mode use-package-chords smex smartparens smart-shift sexy-monochrome-theme restclient persistent-scratch org-bullets nlinum neotree minions lsp-ui kubernetes ivy-hydra indium iedit goto-chg gorepl-mode golden-ratio go-playground go-guru go-complete git-timemachine git-gutter flycheck-yamllint exec-path-from-shell emmet-mode elpy dumb-jump dockerfile-mode docker cython-mode counsel-projectile conda company-tern company-lsp company-jedi color-theme-sanityinc-solarized cherry-blossom-theme aggressive-indent ag))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

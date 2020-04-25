@@ -2,18 +2,9 @@
 (set-face-attribute 'default nil :height 150)
 
 (setq exec-path-from-shell-check-startup-files -1)
-
+(load-theme 'manoj-dark)
 (use-package color-theme-sanityinc-solarized
-  :ensure t
-  :config
-  ;;(load-theme 'deeper-blue)
-  )
-
-(use-package color-theme-sanityinc-solarized
-  :load-path "~/.emacs.d/package/hemisu-theme/"
-  ;;(load-theme 'hemisu-light-theme)
-  )
-
+  :ensure t)
 
 
 (use-package powerline
@@ -41,6 +32,7 @@
 
 
 (use-package minions
+  :ensure t
   :config
   (setq minions-mode-line-lighter ""
         minions-mode-line-delimiters '("" . ""))
@@ -60,8 +52,6 @@
 
 (use-package git-timemachine
   :ensure t)
-
-
 
 (use-package aggressive-indent
   :ensure t
@@ -84,69 +74,81 @@
 ;; ;;golang
 ;; ;;============================================================================
 
+(use-package company-go
+  :load-path "/home/nithin/.emacs.d/packages/company-go"
+  )
 
-(defvar go-tab-width 8
-  "Set the `tab-width' in Go mode. Default is 8.")
+;; (defvar go-tab-width 4
+;;   "Set the `tab-width' in Go mode. Default is 8.")
 
-(defvar go-use-gometalinter nil
-  "Use gometalinter if the variable has non-nil value.")
+;; (defvar go-use-gometalinter nil
+;;   "Use gometalinter if the variable has non-nil value.")
 
 (defun my-go-run-main ()
   (interactive)
   (shell-command
-   (format "go run %s"
-	   (shell-quote-argument (buffer-file-name)))))
+   (format "go run %s"     (shell-quote-argument (buffer-file-name)))
+   ))
 
 
 (defun spacemacs//go-enable-gometalinter ()
   "Enable `flycheck-gometalinter' and disable overlapping `flycheck' linters."
-  (setq flycheck-disabled-checkers '(go-gofmt
-				     go-golint
-				     go-vet
-				     go-build
-				     go-test
-				     go-errcheck)
-	))
+  (setq flycheck-disabled-checkers '(
+                                     go-vet
+                                     go-build
+                                     go-test
+                                     go-errcheck)))
 
 (defun my-go-var-shortcut ()
   (interactive)
-  (insert " := "))
+  (insert " := ")
+  )
 
-(use-package go-mode
-  :ensure t
-  :init	(progn
-	  (autoload 'go-mode "go-mode" nil t)
-	  (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
-	  (setq-local tab-width go-tab-width)
-	  )
-
-
-  :config (progn
-	    (flymake-mode -1)
-	    (if  (string-match "make" compile-command)
-		(set (make-local-variable 'compile-command)
-		     "go build -v && go test -v && go vet"))
-	    (if (executable-find "goimports")
-		(setq gofmt-command "goimports")))
-
-  :hook ((go-mode-hook . flycheck-mode)
-	 (before-save-hook . gofmt-before-save ))
-
-  :bind	(:map go-mode-map
-	      ("C-;" . my-go-var-shortcut)
-	      ("M-." . godef-jump)
-	      ("M-*" . pop-tag-mark)
-	      ("C-c RET" . compile)
-	      ("<C-return>" . my-go-run-main))  
+(defun my-go-write-into-ch-shortcut ()
+  (interactive)
+  (insert "<-")
   )
 
 
+(use-package go-mode
+  :ensure t
+  :init (progn
+          (autoload 'go-mode "go-mode" nil t)
+          (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+          )
+  :config (progn
+            (if  (string-match "make" compile-command)
+                (set (make-local-variable 'compile-command)
+                     "go build -v && go test -v && go vet"))
+            (if (executable-find "goimports")
+                (setq gofmt-command "goimports")
+              (setq gofmt-args '("-local" "liftoff/")))
+            )
+
+  :bind (:map go-mode-map
+              ("C-<" . my-go-write-into-ch-shortcut)
+              ("C-;" . my-go-var-shortcut)
+              ("M-." . godef-jump)
+              ("M-*" . pop-tag-mark)
+              ("C-c RET" . compile)
+              ("<C-return>" . my-go-run-main))
+  )
+
+(add-hook 'go-mode-hook
+          (lambda ()
+            (setq tab-width 4)
+            (setq indent-tabs-mode 1)
+            (flymake-mode -1)
+            (auto-complete-mode 1)
+            (spacemacs//go-enable-gometalinter)
+            ) )
+
+(add-hook 'before-save-hook 'gofmt-before-save)
+;; (add-hook 'go-mode-hook 'flycheck-mode)
 
 (use-package flycheck-gometalinter
   :defer t
-  :init
-  (add-hook 'go-mode-hook 'spacemacs//go-enable-gometalinter t))
-
+  )
 
 (use-package go-complete
   :ensure t
@@ -172,6 +174,8 @@
   :ensure t
   )
 
+
+
 ;;web-mode
 ;;============================================================================
 
@@ -185,9 +189,9 @@
   (add-to-list 'auto-mode-alist '("/some/react/path/.*\\.js[x]?\\'" . web-mode))
 
   (setq web-mode-content-types-alist
-	'(("json" . "/some/path/.*\\.api\\'")
-	  ("xml"  . "/other/path/.*\\.api\\'")
-	  ("jsx"  . "/some/react/path/.*\\.js[x]?\\'")))
+                '(("json" . "/some/path/.*\\.api\\'")
+                  ("xml"  . "/other/path/.*\\.api\\'")
+                  ("jsx"  . "/some/react/path/.*\\.js[x]?\\'")))
 
   )
 (use-package emmet-mode
@@ -199,11 +203,11 @@
 
 ;;dired-mode
 ;;===========================================D=================================
-(use-package dired-details
-  :load-path "~/.emacs.d/package/dired-details/"
-  :config
-  (setq-default dired-details-hidden-string "--- ")
-  (dired-details-install))
+;; (use-package dired-details
+;;   :load-path "~/.emacs.d/package/dired-details/"
+;;   :config
+;;   (setq-default dired-details-hidden-string "--- ")
+;;   (dired-details-install))
 ;; Auto refresh buffers
 (global-auto-revert-mode 1)
 
@@ -214,28 +218,6 @@
 
 
 
-
-;; lsp  configrations
-;;============================================================================
-
-
-(use-package lsp-mode
-  :ensure t
-  :hook (python-mode . lsp)
-  :hook (go-mode . lsp)
-  :commands lsp)
-
-;; optionally
-(use-package lsp-ui :ensure t :commands lsp-ui-mode)
-
-(use-package company-lsp :ensure t :commands company-lsp)
-
-(use-package flycheck
-  :ensure t
-  :hook (python-mode-hook . flycheck-mode)
-  )
-
-(add-hook 'go-mode-hook #'lsp-deferred)
 
 
 ;;sql specific
@@ -311,18 +293,21 @@
  'org-babel-load-languages
  '((python . t)))
 
+
+;; (use-package cython
+;;   :ensure  t)
+
 ;; markdown mode
 ;;============================================================================
-
-
+;;(setq markdown-command "multimarkdown"))
+;;(setq markdown-command "pandoc")
 (use-package markdown-mode
   :ensure t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
-	 ("\\.md\\'" . markdown-mode)
-	 ("\\.markdown\\'" . markdown-mode))
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
-
 ;; JS mode
 ;;============================================================================
 
@@ -350,7 +335,7 @@
   (define-key js-mode-map (kbd "M-.") nil)
 
   (add-hook 'js2-mode-hook (lambda ()
-			     (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
+                                                         (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
 
 
 
@@ -371,8 +356,8 @@
 
 (add-to-list 'company-backends 'company-tern)
 (add-hook 'js2-mode-hook (lambda ()
-			   (tern-mode)
-			   (company-mode)))
+                                                   (tern-mode)
+                                                   (company-mode)))
 
 (define-key tern-mode-keymap (kbd "M-.") nil)
 (define-key tern-mode-keymap (kbd "M-,") nil)
@@ -404,3 +389,132 @@
 ;;   (setq nlinum-relative-current-symbol "->")      ;; or "" for display current line number
 ;;   (setq nlinum-relative-offset 0)
 ;;   (add-hook 'prog-mode-hook 'nlinum-relative-mode))
+
+
+
+
+;; yaml support
+;;============================================================================
+
+(use-package highlight-indentation
+  :load-path "/home/nithin/.emacs.d/packges/Highlight-Indentation-for-Emacs/highlight-indentation.el"
+  :config
+  (setq highlight-indentation t)
+  )
+
+
+(use-package smart-shift
+  :ensure t)
+
+
+(defun aj-toggle-fold ()
+  "Toggle fold all lines larger than indentation on current line"
+  (interactive)
+  (let ((col 1))
+    (save-excursion
+      (back-to-indentation)
+      (setq col (+ 1 (current-column)))
+      (set-selective-display
+       (if selective-display nil (or col 1))))))
+(global-set-key [(M C i)] 'aj-toggle-fold)
+
+
+(use-package yaml-mode
+  :ensure t
+  :config
+  (setq yaml-indent-offset 2))
+;; :hook (yaml-mode . smart-shift-mode-hook)) ;
+
+
+(use-package flycheck-yamllint
+  :ensure t
+  :defer t
+  :init
+  (progn
+    (eval-after-load 'flycheck
+      '(add-hook 'flycheck-mode-hook 'flycheck-yamllint-setup))))
+
+
+(use-package golden-ratio
+  :ensure t
+  )
+
+
+
+
+;; lsp  configrations
+;;============================================================================
+(use-package which-key
+  :ensure t)
+
+(use-package lsp-mode
+  :ensure t
+  :hook ((python-mode . lsp)
+         (go-mode . lsp)
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+;; optionally
+(use-package lsp-ui :ensure t :commands lsp-ui-mode)
+
+(use-package company-lsp :ensure t :commands company-lsp)
+(use-package company-lsp :commands company-lsp)
+
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+(use-package flycheck
+  :ensure t
+  :hook (python-mode-hook . flycheck-mode)
+  )
+
+(add-hook 'go-mode-hook #'lsp-deferred)
+;; terminal mode setup
+;;============================================================================
+
+(use-package terminal-here
+  :ensure t
+  )
+
+(global-set-key (kbd "C-<f6>") #'terminal-here-launch)
+(global-set-key (kbd "C-<f7>") #'terminal-here-project-launch)
+
+
+
+;; Writing book  configrations
+;;============================================================================
+
+;; (use-package vmd-mode
+;;   :ensure t
+;;   :defer t)
+
+(use-package ox-gfm
+  :ensure t)
+
+;; (add-hook 'markdown-mode-hook 'vmd-mode)
+
+(use-package cl-lib
+  :ensure t)
+
+(use-package mmm-mode
+  :commands mmm-mode
+  :init (add-hook 'markdown-mode-hook  (lambda () (mmm-mode 1)))
+  :config
+  (progn
+
+    (mmm-add-classes '((markdown-lisp
+                        :submode lisp-mode
+                        :front "^```lisp[\n\r]+"
+                        :back "^```$")))
+
+    (mmm-add-classes '((markdown-ini
+                        :submode conf-unix-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```ini[\n\r]+"
+                        :back "^```$")))
+    (mmm-add-classes '((markdown-python
+                        :submode python-mode
+                        :face mmm-declaration-submode-face
+                        :front "^```python[\n\r]+"
+                        :back "^```$")))
+    ))
