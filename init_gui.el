@@ -1,11 +1,18 @@
 (windmove-default-keybindings)
-(set-face-attribute 'default nil :height 150)
+(set-face-attribute 'default nil :height 178)
 
 (setq exec-path-from-shell-check-startup-files -1)
-(load-theme 'manoj-dark)
-(use-package color-theme-sanityinc-solarized
-  :ensure t)
+;;(load-theme 'manoj-dark)
 
+(use-package doom-themes
+  :ensure t
+  :init
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  :config
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config)
+  (load-theme 'doom-solarized-dark  t))
 
 (use-package powerline
   :disabled
@@ -58,6 +65,18 @@
   :config
   (global-aggressive-indent-mode 1)
   (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
+
+(use-package bicycle
+  :ensure t
+  :after outline
+  :bind (:map outline-minor-mode-map
+              ([C-tab] . bicycle-cycle)
+              ([S-tab] . bicycle-cycle-global)))
+
+(use-package prog-mode
+  :config
+  (add-hook 'prog-mode-hook 'outline-minor-mode)
+  (add-hook 'prog-mode-hook 'hs-minor-mode))
 
 ;;exec
 ;;============================================================================
@@ -198,24 +217,25 @@
   :ensure t
   :hook (html-mode . emmet-mode))
 
+(add-hook  'web-mode-hook 'emmet-mode )
+
 (use-package restclient
   :ensure t)
 
 ;;dired-mode
 ;;===========================================D=================================
-;; (use-package dired-details
-;;   :load-path "~/.emacs.d/package/dired-details/"
-;;   :config
-;;   (setq-default dired-details-hidden-string "--- ")
-;;   (dired-details-install))
-;; Auto refresh buffers
-(global-auto-revert-mode 1)
+;;(use-package dired-details
+;; :ensure t ;;load-path "~/.emacs.d/package/dired-details/"
+;; :config
+;; (setq-default dired-details-hidden-string "--- ")
+;; (dired-details-install))
+;;to refresh buffers
+;; (global-auto-revert-mode 1)
 
-;; Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
-(setq dried-dwim-target t)
-
+;; ;; Also auto refresh dired, but be quiet about it
+;; (setq global-auto-revert-non-file-buffers t)
+;; (setq auto-revert-verbose nil)
+;; (setq dried-dwim-target t)
 
 
 
@@ -312,55 +332,50 @@
 ;;============================================================================
 
 
-(use-package js2-mode
+(use-package rjsx-mode
   :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-  ;; Better imenu
-  (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-  ())
+  :mode "\\.js\\'")
+
+;; npm install -g typescript
+
+(defun setup-tide-mode()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (tide-hl-identifier-mode +1)
+  (company-mode +1)
+  )
+
+(use-package tide
+  :ensure t
+  :after (rjsx-mode company flycheck)
+  :hook (rjsx-mode . setup-tide-mode)
+  )
 
 
+(use-package prettier-js
+  :ensure t
+  :after (rjsx-mode)
+  :hook(rjsx-mode . prettier-js-mode))
 
 (use-package xref-js2
   :ensure t)
 
-(use-package js2-refactor
-  :ensure t
-  :config
-  (add-hook 'js2-mode-hook #'js2-refactor-mode)
-  (js2r-add-keybindings-with-prefix "C-c C-r")
-  (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
-
-  (define-key js-mode-map (kbd "M-.") nil)
-
-  (add-hook 'js2-mode-hook (lambda ()
-                                                         (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
-
-
-
-(autoload 'js2-mode "js2-mode" nil t)
-(autoload 'js2-jsx-mode "js2-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-jsx-mode))
-;;(add-to-list 'auto-mode-alist '("\\.jsx$" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . js2-mode))
-
-(custom-set-variables '(js2-strict-inconsistent-return-warning nil))
-(custom-set-variables '(js2-strict-missing-semi-warning nil))
 
 (use-package indium
   :ensure t)
 
-(use-package company-tern
-  :ensure t)
+;; (use-package company-tern
+;;   :ensure t)
 
-(add-to-list 'company-backends 'company-tern)
-(add-hook 'js2-mode-hook (lambda ()
-                                                   (tern-mode)
-                                                   (company-mode)))
+;; (add-to-list 'company-backends 'company-tern)
+;; (add-hook 'js2-mode-hook (lambda ()
+;;                                                    (tern-mode)
+;;                                                    (company-mode)))
 
-(define-key tern-mode-keymap (kbd "M-.") nil)
-(define-key tern-mode-keymap (kbd "M-,") nil)
+;; (define-key tern-mode-keymap (kbd "M-.") nil)
+;; (define-key tern-mode-keymap (kbd "M-,") nil)
 ;;============================================================================
 
 
