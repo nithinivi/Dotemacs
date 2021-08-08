@@ -1,2 +1,2 @@
 # Dotemacs
-My emacs config. The main focus was on speed and well as light weight build
+My emacs config. The main focus was on loading speed and python development 
