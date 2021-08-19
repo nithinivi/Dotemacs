@@ -1,5 +1,5 @@
 (windmove-default-keybindings)
-(set-face-attribute 'default nil :height 178)
+(set-face-attribute 'default nil :height 168)
 
 (setq exec-path-from-shell-check-startup-files -1)
 ;;(load-theme 'manoj-dark)
@@ -12,7 +12,9 @@
   :config
   (doom-themes-visual-bell-config)
   (doom-themes-org-config)
-  (load-theme 'doom-solarized-dark  t))
+  )
+
+(load-theme 'material  t)
 
 (use-package powerline
   :disabled
@@ -94,7 +96,7 @@
 ;; ;;============================================================================
 
 (use-package company-go
-  :load-path "/home/nithin/.emacs.d/packages/company-go"
+  :ensure t
   )
 
 ;; (defvar go-tab-width 4
@@ -412,7 +414,7 @@
 ;;============================================================================
 
 (use-package highlight-indentation
-  :load-path "/home/nithin/.emacs.d/packges/Highlight-Indentation-for-Emacs/highlight-indentation.el"
+  :ensure t
   :config
   (setq highlight-indentation t)
   )

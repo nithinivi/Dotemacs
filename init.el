@@ -15,6 +15,7 @@
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 
 (scroll-bar-mode -1)
+(menu-bar-mode -1)
 (tool-bar-mode -1)
 (blink-cursor-mode -1)
 (show-paren-mode t)
@@ -22,11 +23,15 @@
 (setq column-number-mode 1)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message "")
+
+
+
 (setq make-backup-files nil)
                                         ;disable backup
 (setq backup-inhibited t)
                                         ;disable auto save
-(setq auto-save-default nil)
+(setq auto-save-default -1)
+(setq backup-directory-alist `(("." . "~/.saves")))
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
@@ -344,12 +349,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#002b36" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#839496"])
  '(custom-safe-themes
    (quote
-    ("04589c18c2087cd6f12c01807eed0bdaa63983787025c209b89c779c61c3a4c4" "229c5cf9c9bd4012be621d271320036c69a14758f70e60385e87880b46d60780" "8a0c35b74b0407ca465dd8db28c9136d5f539868d4867565ee214ac85ceb0d3a" "d74c5485d42ca4b7f3092e50db687600d0e16006d8fa335c69cf4f379dbd0eee" "76bfa9318742342233d8b0b42e824130b3a50dcc732866ff8e47366aed69de11" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4555bf2b98f0ffef52bc4870f3014304b0e2ed22549c395dffc10af88d577791" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
+    ("d4f8fcc20d4b44bf5796196dbeabec42078c2ddb16dcb6ec145a1c610e0842f3" "afd761c9b0f52ac19764b99d7a4d871fc329f7392dfc6cd29710e8209c691477" "04589c18c2087cd6f12c01807eed0bdaa63983787025c209b89c779c61c3a4c4" "229c5cf9c9bd4012be621d271320036c69a14758f70e60385e87880b46d60780" "8a0c35b74b0407ca465dd8db28c9136d5f539868d4867565ee214ac85ceb0d3a" "d74c5485d42ca4b7f3092e50db687600d0e16006d8fa335c69cf4f379dbd0eee" "76bfa9318742342233d8b0b42e824130b3a50dcc732866ff8e47366aed69de11" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4555bf2b98f0ffef52bc4870f3014304b0e2ed22549c395dffc10af88d577791" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
  '(fci-rule-color "#405A61")
+ '(hl-sexp-background-color "#efebe9")
  '(jdee-db-active-breakpoint-face-colors (cons "#073642" "#268bd2"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#073642" "#859900"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#073642" "#56697A"))
@@ -358,7 +366,7 @@
  '(objed-cursor-color "#dc322f")
  '(package-selected-packages
    (quote
-    (org-babel-eval-in-repl htmlize bicycle yafolding origami prettier-js tide rjsx-mode avy dired-details doom-themes terminal-here mmm-mode ox-publish vmd-mode ox-gfm imenus imenu-anywhere material-theme go-autocomplete yasnippet-snippets yaml-mode xref-js2 which-key web-mode use-package-chords smex smartparens smart-shift sexy-monochrome-theme restclient persistent-scratch org-bullets nlinum neotree minions lsp-ui kubernetes ivy-hydra indium iedit goto-chg gorepl-mode golden-ratio go-playground go-guru go-complete git-timemachine git-gutter flycheck-yamllint exec-path-from-shell emmet-mode elpy dumb-jump dockerfile-mode docker cython-mode counsel-projectile conda company-tern company-lsp company-jedi color-theme-sanityinc-solarized cherry-blossom-theme aggressive-indent ag)))
+    (nginx-mode org-babel-eval-in-repl htmlize bicycle yafolding origami prettier-js tide rjsx-mode avy dired-details doom-themes terminal-here mmm-mode ox-publish vmd-mode ox-gfm imenus imenu-anywhere material-theme go-autocomplete yasnippet-snippets yaml-mode xref-js2 which-key web-mode use-package-chords smex smartparens smart-shift sexy-monochrome-theme restclient persistent-scratch org-bullets nlinum neotree minions lsp-ui kubernetes ivy-hydra indium iedit goto-chg gorepl-mode golden-ratio go-playground go-guru go-complete git-timemachine git-gutter flycheck-yamllint exec-path-from-shell emmet-mode elpy dumb-jump dockerfile-mode docker cython-mode counsel-projectile conda company-tern company-lsp company-jedi color-theme-sanityinc-solarized cherry-blossom-theme aggressive-indent ag)))
  '(pdf-view-midnight-colors (cons "#839496" "#002b36"))
  '(rustic-ansi-faces
    ["#002b36" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#839496"])
