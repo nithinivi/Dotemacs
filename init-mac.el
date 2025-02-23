@@ -16,6 +16,9 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(setq ring-bell-function 'ignore
+      visible-bell nil)
+
 
 (tool-bar-mode -1)             ; Hide the outdated icons
 (scroll-bar-mode -1)           ; Hide the always-visible scrollbar
@@ -107,6 +110,9 @@
   :config
   (which-key-mode))
 
+(use-package counsel)
+(use-package swiper)
+
 (use-package general
   :demand
   :config
@@ -114,6 +120,13 @@
   (general-create-definer leader-keys
     :keymaps 'override-global-map
     :prefix "M-c")
+
+  (general-define-key "M-x" 'counsel-M-x)
+  (general-define-key "C-x C-f" 'counsel-find-file)
+  (general-define-key "C-s" 'swiper-isearch)
+  (general-define-key "M-y" 'counsel-yank-pop)
+  (general-define-key "C-x b" 'ivy-switch-buffer)
+  
   
 
   (leader-keys
@@ -130,7 +143,18 @@
     "b" '(:ignore t :which-key "buffer")
     ;; Don't show an error because SPC b ESC is undefined, just abort
     "b <escape>" '(keyboard-escape-quit :which-key t) 
-    "bd"  'kill-current-buffer))
+    "bd"  'kill-current-buffer
+
+    "w" '(:ignore t :which-key "Window")
+    "wl"  'windmove-right
+    "wh"  'windmove-left
+    "wk"  'windmove-up
+    "wj"  'windmove-down
+    "w/"  'split-window-right
+    "w-"  'split-window-below
+    "wx"  'delete-window
+    )
+  )
 
 
 (use-package undo-tree
@@ -164,7 +188,9 @@
     (setq yas-snippet-dirs '(yasnippet-snippets-dir)))
   (yas-reload-all)
   (add-hook 'prog-mode-hook 'yas-minor-mode)
-  (add-hook 'text-mode-hook 'yas-minor-mode))
+  (add-hook 'text-mode-hook 'yas-minor-mode)
+  (yas-global-mode 1)
+  )
 
 (use-package projectile
 	:demand
@@ -247,12 +273,19 @@
   :hook (rust-mode . eglot-ensure)
   :hook (go-mode . eglot-ensure)
   :hook (typescript-mode . eglot-ensure)
+  :hook (c-mode . eglot-ensure)
+  :hook (c++-mode . eglot-ensure)
   :general
   (leader-keys
     "l" '(:ignore t :which-key "lsp")
     "l <escape>" '(keyboard-escape-quit :which-key t)
     "l r" '(eglot-rename :which-key "rename")
-    "l a" '(eglot-code-actions :which-key "code actions")))
+    "l a" '(eglot-code-actions :which-key "code actions"))
+  :config
+  (setq eglot-autoreconnect t
+        eglot-autoshutdown t)
+
+  )
 
 (use-package treesit-auto
   :custom
@@ -264,6 +297,7 @@
 (use-package markdown-mode
   :config
   (setq markdown-fontify-code-blocks-natively t))
+
 (use-package zig-mode
   :general
   (leader-keys
@@ -272,6 +306,7 @@
     "m b" '(zig-compile :which-key "build")
     "m r" '(zig-run :which-key "run")
     "m t" '(zig-test :which-key "test")))
+
 (use-package rust-mode
   :general
   (leader-keys
@@ -282,6 +317,7 @@
     "m t" '(rust-test :which-key "test")
     "m k" '(rust-check :which-key "check")
     "m c" '(rust-run-clippy :which-key "clippy")))
+
 (use-package go-mode)
 (use-package gotest
   :general
@@ -304,3 +340,23 @@
                       :foreground "#edf0f0"
                       :background "transparent")
   (global-display-fill-column-indicator-mode 1))
+(use-package org-mode)
+(use-package org-tree-slide
+  :custom
+  (org-image-actual-width nil)
+  :config
+  (setq org-tree-slide-heading-emphasis t      ;; Emphasize headings
+        org-tree-slide-slide-in-effect t       ;; Enable slide-in effect
+        org-tree-slide-activate-message "Presentation mode ON"
+        org-tree-slide-deactivate-message "Presentation mode OFF"
+        org-tree-slide-modeline-display 'both  ;; Show slide number & mode
+        org-tree-slide-skip-done nil           ;; Skip DONE headlines
+        org-tree-slide-skip-comments t         ;; Skip commented sections
+        org-tree-slide-content-margin 10)       ;; Add margin for readability
+  (org-tree-slide-simple-profile))
+
+
+;;(use-package ox-qmd)
+
+
+
